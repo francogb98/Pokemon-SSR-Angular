@@ -43,7 +43,7 @@ export default class PokemonPageComponent implements OnInit {
           this.meta.updateTag({ name: 'og:title', content: pageTitle });
           this.meta.updateTag({
             name: 'og:image',
-            content: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/dream-world/${id}.png`,
+            content: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`,
           });
         })
       )

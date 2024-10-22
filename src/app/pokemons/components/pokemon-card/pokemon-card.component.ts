@@ -13,8 +13,8 @@ export class PokemonCardComponent {
   public pokemon = input.required<SimplePokemon>();
   public imagePokemon = computed(
     () =>
-      `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/dream-world/${
+      `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${
         this.pokemon().id
-      }.svg`
+      }.png`
   );
 }
