@@ -1,0 +1,31 @@
+@if(pokemon()===null){
+
+<div class="flex flex-col justify-center">
+  <div class="flex justify-center">
+    <h1 class="text-4xl font-bold capitalize my-5">Loading...</h1>
+  </div>
+</div>
+}@else { @let myPokemon = pokemon()!; @let myPokemonImage =
+myPokemon.sprites.other?.['official-artwork']?.front_default;
+
+<section class="flex flex-col justify-center">
+  <div class="flex justify-center">
+    <h1 class="text-4xl font-bold capitalize my-5">{{ myPokemon.name }}</h1>
+  </div>
+</section>
+<section class="flex flex-col justify-center items-center w-full">
+  <img
+    [src]="myPokemonImage"
+    alt="myPokemon.name"
+    class="w-64 h-64"
+    width="256px"
+    height="256px"
+  />
+  @if(myPokemon.cries.legacy !== null){
+  <audio controls class="my-10">
+    <source [src]="myPokemon.cries.legacy" type="audio/wav" />
+  </audio>
+  }
+</section>
+
+}
