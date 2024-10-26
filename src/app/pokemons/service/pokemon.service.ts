@@ -28,8 +28,7 @@ export class PokemonService {
             })
           );
           return SimplePokemons;
-        }),
-        tap((pokemons) => console.log(pokemons))
+        })
       );
   }
   public loadPokemon(id: string) {
