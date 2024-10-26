@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   OnInit,
+  effect,
   inject,
   signal,
 } from '@angular/core';
@@ -9,7 +10,7 @@ import { PokemonListComponent } from '../../pokemons/components/pokemon-list/pok
 import { PokemonListSkeletonComponent } from './ui/pokemon-list-skeleton/pokemon-list-skeleton.component';
 import { PokemonService } from '../../pokemons/service/pokemon.service';
 import { SimplePokemon } from '../../pokemons/interfaces';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map, tap } from 'rxjs';
 import { Title } from '@angular/platform-browser';
@@ -17,12 +18,12 @@ import { Title } from '@angular/platform-browser';
 @Component({
   selector: 'app-pokemons',
   standalone: true,
-  imports: [PokemonListComponent, PokemonListSkeletonComponent],
+  imports: [PokemonListComponent, PokemonListSkeletonComponent, RouterLink],
   templateUrl: './pokemons.component.html',
   styleUrl: './pokemons.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export default class PokemonsComponent implements OnInit {
+export default class PokemonsComponent {
   public title = inject(Title);
 
   private pokemonsService = inject(PokemonService);
@@ -31,9 +32,23 @@ export default class PokemonsComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
+  //de esta forma extraaemos informacion de los query
+
+  /**
+   *
   public currentPage = toSignal(
     this.route.queryParamMap.pipe(
       map((params) => params.get('page') ?? '1'),
+      map((page) => (isNaN(+page) ? 1 : +page)),
+      map((page) => Math.max(1, page))
+    )
+  );
+  */
+
+  //de esta forma extraaemos informacion de los params
+  public currentPage = toSignal(
+    this.route.params.pipe(
+      map((params) => params['page'] ?? '1'),
       map((page) => (isNaN(+page) ? 1 : +page)),
       map((page) => Math.max(1, page))
     )
@@ -45,22 +60,23 @@ export default class PokemonsComponent implements OnInit {
 
   // })
 
-  ngOnInit(): void {
-    this.loadPokemons();
-  }
+  // ngOnInit(): void {
+  //   this.loadPokemons();
+  // }
+
+  public loadOnPageChanged = effect(
+    () => {
+      this.loadPokemons(this.currentPage());
+    },
+    {
+      allowSignalWrites: true,
+    }
+  );
 
   public loadPokemons(page = 0) {
-    const pageToLoad = this.currentPage()! + page;
-
     this.pokemonsService
-      .loadPage(pageToLoad)
-      .pipe(
-        tap(() =>
-          //modifico los aprametros de mi rutaa
-          this.router.navigate([], { queryParams: { page: pageToLoad } })
-        ),
-        tap(() => this.title.setTitle(`Pokemons SSR - Page ${pageToLoad}`))
-      )
+      .loadPage(page)
+      .pipe(tap(() => this.title.setTitle(`Pokemons SSR - Page ${page}`)))
       .subscribe((pokemons) => this.pokemons.set(pokemons));
   }
 }
