@@ -24,48 +24,23 @@ import { Title } from '@angular/platform-browser';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class PokemonsComponent {
-  public title = inject(Title);
-
   private pokemonsService = inject(PokemonService);
   public pokemons = signal<SimplePokemon[]>([]);
 
   private route = inject(ActivatedRoute);
-  private router = inject(Router);
-
-  //de esta forma extraaemos informacion de los query
-
-  /**
-   *
-  public currentPage = toSignal(
-    this.route.queryParamMap.pipe(
-      map((params) => params.get('page') ?? '1'),
-      map((page) => (isNaN(+page) ? 1 : +page)),
-      map((page) => Math.max(1, page))
-    )
-  );
-  */
+  public title = inject(Title);
 
   //de esta forma extraaemos informacion de los params
-  public currentPage = toSignal(
+  public currentPage = toSignal<number>(
     this.route.params.pipe(
       map((params) => params['page'] ?? '1'),
       map((page) => (isNaN(+page) ? 1 : +page)),
       map((page) => Math.max(1, page))
     )
   );
-
-  // private appRef = inject(ApplicationRef)
-  // private $appRef = this.appRef.isStable.subscribe((isStable)=>{
-  //   console.log(isStable);
-
-  // })
-
-  // ngOnInit(): void {
-  //   this.loadPokemons();
-  // }
-
   public loadOnPageChanged = effect(
     () => {
+      console.log(this.currentPage());
       this.loadPokemons(this.currentPage());
     },
     {
@@ -74,6 +49,8 @@ export default class PokemonsComponent {
   );
 
   public loadPokemons(page = 0) {
+    console.log(page);
+
     this.pokemonsService
       .loadPage(page)
       .pipe(tap(() => this.title.setTitle(`Pokemons SSR - Page ${page}`)))
